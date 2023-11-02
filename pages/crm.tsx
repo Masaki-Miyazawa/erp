@@ -1,29 +1,27 @@
 // pages/crm.tsx
-import { useState } from "react";
-import { db } from "../src/utils/firebase";
-import { collection, addDoc } from "firebase/firestore";
-import { addNewCustomer } from "../src/utils/functions";
-import { Customer } from "../src/utils/types";
-import { Timestamp } from "firebase/firestore";
-import { GetServerSideProps } from "next";
-import { checkAuth } from "../src/utils/auth";
+import { useState } from "react"
+import { addNewCustomer } from "../src/utils/functions"
+import { Customer } from "../src/utils/types"
+import { Timestamp } from "firebase/firestore"
+import { GetServerSideProps } from "next"
+import { checkAuth } from "../src/utils/auth"
 
 export default function CRM() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [error, setError] = useState("");
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+  const [address, setAddress] = useState("")
+  const [error, setError] = useState("")
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError("");
+    event.preventDefault()
+    setError("")
 
     //Dateオブジェクト
-    const dateObject = new Date();
+    const dateObject = new Date()
 
     // DateオブジェクトからFirestoreのTimestampに変換
-    const timestamp = Timestamp.fromDate(dateObject);
+    const timestamp = Timestamp.fromDate(dateObject)
 
     // Customer インターフェースに基づいて顧客データを作成
     const customerData: Customer = {
@@ -33,25 +31,25 @@ export default function CRM() {
       address,
       createdAt: timestamp,
       updatedAt: timestamp,
-    };
+    }
 
     try {
-      await addNewCustomer(customerData);
+      await addNewCustomer(customerData)
       // 登録後の処理
-      setName("");
-      setEmail("");
-      setPhone("");
-      setAddress("");
+      setName("")
+      setEmail("")
+      setPhone("")
+      setAddress("")
     } catch (err) {
-      setError("データの保存に失敗しました。");
+      setError("データの保存に失敗しました。")
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-center text-3xl leading-9 font-extrabold text-gray-900">
-          CRM顧客情報登録
+                    CRM顧客情報登録
         </h2>
       </div>
 
@@ -63,7 +61,7 @@ export default function CRM() {
                 htmlFor="name"
                 className="block text-sm font-medium leading-5 text-gray-700"
               >
-                名前
+                                名前
               </label>
               <div className="mt-1 rounded-md shadow-sm">
                 <input
@@ -82,7 +80,7 @@ export default function CRM() {
                 htmlFor="email"
                 className="block text-sm font-medium leading-5 text-gray-700"
               >
-                メールアドレス
+                                メールアドレス
               </label>
               <div className="mt-1 rounded-md shadow-sm">
                 <input
@@ -101,7 +99,7 @@ export default function CRM() {
                 htmlFor="phone"
                 className="block text-sm font-medium leading-5 text-gray-700"
               >
-                電話番号
+                                電話番号
               </label>
               <div className="mt-1 rounded-md shadow-sm">
                 <input
@@ -120,7 +118,7 @@ export default function CRM() {
                 htmlFor="address"
                 className="block text-sm font-medium leading-5 text-gray-700"
               >
-                住所
+                                住所
               </label>
               <div className="mt-1 rounded-md shadow-sm">
                 <textarea
@@ -140,7 +138,7 @@ export default function CRM() {
                   type="submit"
                   className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
                 >
-                  登録
+                                    登録
                 </button>
               </span>
             </div>
@@ -151,10 +149,10 @@ export default function CRM() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   // checkAuthヘルパー関数を使用して認証チェックを行う
-  return await checkAuth(context);
-};
+  return await checkAuth(context)
+}

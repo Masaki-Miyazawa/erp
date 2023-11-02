@@ -1,7 +1,7 @@
 // pages/home.tsx
-import Link from "next/link";
-import { GetServerSideProps } from "next";
-import { checkAuth } from "../src/utils/auth";
+import Link from "next/link"
+import { GetServerSideProps } from "next"
+import { checkAuth } from "../src/utils/auth"
 
 export default function Home() {
   return (
@@ -19,10 +19,10 @@ export default function Home() {
         </ul>
       </nav>
     </main>
-  );
+  )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   // checkAuthヘルパー関数を使用して認証チェックを行う
-  return await checkAuth(context);
-};
+  return await checkAuth(context)
+}
