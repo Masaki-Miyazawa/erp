@@ -1,38 +1,50 @@
 // pages/signup.tsx
-import { useState } from "react";
-import { useRouter } from "next/router";
-import { auth } from "../src/utils/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useState } from "react"
+import { useRouter } from "next/router"
+import { auth } from "../src/utils/firebase"
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth"
 
 export default function Signup() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const router = useRouter();
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const router = useRouter()
+
+  // サインインページに戻る関数
+  const handleSignIn = () => {
+    router.push('/signin')
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError("");
+    event.preventDefault()
+    setError("")
     if (!email || !password) {
-      setError("EmailとPasswordは必須です。");
-      return;
+      setError("EmailとPasswordは必須です。")
+      return
     }
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
-      );
-      console.log("Signed up with:", userCredential.user);
-      router.push("/signin"); // サインインページにリダイレクト
+      )
+
+      // メールアドレスの検証メールを送信
+      await sendEmailVerification(userCredential.user, {
+        // エミュレーターを使用している場合は、このURLをエミュレーターUIに置き換えます
+        url: `http://localhost:4000/emulator/auth/handlers/action?mode=action&oobCode=code`
+      })
+
+      console.log("Signed up with:", userCredential.user)
+      router.push("/verify-email") // メール検証の案内ページにリダイレクト
     } catch (error) {
       if (error instanceof Error) {
-        setError(error.message);
+        setError(error.message)
       } else {
-        setError("サインアップ中にエラーが発生しました。");
+        setError("サインアップ中にエラーが発生しました。")
       }
     }
-  };
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8">
@@ -87,6 +99,17 @@ export default function Signup() {
               サインアップ
             </button>
           </div>
+          <div className="mt-6">
+            <span className="block w-full rounded-md shadow-sm">
+              <button
+                type="button" // ここを 'button' に変更してください
+                onClick={handleSignIn} // onClickイベントにhandleBackを割り当てる
+                className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gray-500 hover:bg-gray-400 focus:outline-none focus:border-gray-600 focus:shadow-outline-gray active:bg-gray-600 transition duration-150 ease-in-out"
+              >
+                サインイン
+              </button>
+            </span>
+          </div>
         </form>
         {error && (
           <div className="text-center text-sm text-red-600" role="alert">
@@ -95,5 +118,5 @@ export default function Signup() {
         )}
       </div>
     </div>
-  );
+  )
 }

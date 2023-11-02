@@ -1,11 +1,13 @@
 // types.ts
 
 import { Timestamp } from "firebase/firestore"
+import { Key } from "react"
 
 /**
  * 顧客データを表すインターフェース。
  */
 export interface Customer {
+  id: Key | null | undefined
   name: string // 顧客の名前
   email: string // 顧客のメールアドレス
   phone: string // 顧客の電話番号

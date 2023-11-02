@@ -1,39 +1,52 @@
 // pages/signin.tsx
-import { useState } from "react";
-import { useRouter } from "next/router";
-import { auth, signInWithEmailAndPassword } from "../src/utils/firebase"; // Firebase 設定をインポート
-import { setCookie } from "nookies";
+import { useState } from "react"
+import { useRouter } from "next/router"
+import { signInWithEmailAndPassword } from "../src/utils/firebase" // Firebase 設定をインポート
+import { setCookie } from "nookies"
+import { getAuth } from "firebase/auth"
+import Link from "next/link"
 
 export default function Signin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const router = useRouter();
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [emailVerified, setEmailVerified] = useState(true)
+  const router = useRouter()
+
+  // 前のページに戻る関数
+  const handleSignUp = () => {
+    router.push('/signup')
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError("");
+    event.preventDefault()
+    setError("")
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      console.log("You are signed in!");
-      const token = await userCredential.user.getIdToken();
+      const auth = getAuth() // Firebase v9+ のAuthインスタンスの取得方法
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      
+      // メールが検証されているかチェック
+      if (!userCredential.user.emailVerified) {
+        setEmailVerified(false) // メールが検証されていない場合はfalseに設定
+        setError("メールアドレスがまだ検証されていません。メールを確認してください。")
+        return // ここで処理を終了
+      }
+
+      console.log("You are signed in!")
+      const token = await userCredential.user.getIdToken()
       setCookie(null, "token", token, {
         maxAge: 30 * 24 * 60 * 60,
         path: "/",
-      });
-      router.push("/home");
+      })
+      router.push("/home")
     } catch (error) {
       if (error instanceof Error) {
-        setError(error.message);
+        setError(error.message)
       } else {
-        setError("サインイン中にエラーが発生しました。");
+        setError("サインイン中にエラーが発生しました。")
       }
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -86,11 +99,33 @@ export default function Signin() {
               サインイン
             </button>
           </div>
+          <div className="mt-6">
+            <span className="block w-full rounded-md shadow-sm">
+              <button
+                type="button" // ここを 'button' に変更してください
+                onClick={handleSignUp} // onClickイベントにhandleBackを割り当てる
+                className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gray-500 hover:bg-gray-400 focus:outline-none focus:border-gray-600 focus:shadow-outline-gray active:bg-gray-600 transition duration-150 ease-in-out"
+              >
+                サインアップ
+              </button>
+            </span>
+          </div>
         </form>
         {error && (
-          <p className="mt-2 text-center text-sm text-red-600">{error}</p>
+          <div className="mt-2 text-center">
+            <p className="text-sm text-red-600">{error}</p>
+            {!emailVerified && ( // emailVerifiedがfalseの場合にリンクを表示
+              <Link href="/resend-verification">
+                <button
+                  className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  検証メールを再送信
+                </button>
+              </Link>
+            )}
+          </div>
         )}
       </div>
     </div>
-  );
+  )
 }
