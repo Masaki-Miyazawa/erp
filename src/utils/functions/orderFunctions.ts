@@ -1,7 +1,7 @@
 // src/utils/orderFunctions.ts
 import { collection, Timestamp, doc, setDoc, runTransaction } from 'firebase/firestore'
 import { db } from '../firebase' // 正しいパスに修正してください
-import { Customer, Order, OrderItem } from '../types' // 正しいパスに修正してください
+import { Customer, Order, OrderItem} from '../types' // 正しいパスに修正してください
 
 export const submitOrder = async (
   customer: Customer | null,
@@ -35,37 +35,33 @@ export const submitOrder = async (
       return newOrderNumber
     })
 
-    // 注文アイテムごとの小計を計算
-    const updatedOrderItems = orderItems.map(item => ({
-      ...item,
-      subtotal: item.price * item.quantity // 小計を計算して追加
-    }))
-
-    // Order型に基づいて注文データを作成
-    const orderData: Order = {
-      orderNumber: orderNumber,
-      customerId: customer.id,
+    // Order型に基づいて注文データを作成（orderItemsは含まない）
+    const orderData: Omit<Order, 'orderItems'> = {
+      id: orderNumber,
+      customerId: typeof customer.id === 'string' ? customer.id : customer.id.toString(),
       orderDate: Timestamp.now(),
-      totalAmount: updatedOrderItems.reduce((total, item) => total + item.subtotal, 0),
-      items: updatedOrderItems
+      totalAmount: order.totalAmount, // 事前に計算された合計金額を使用
     }
 
     // 注文ドキュメントを作成
     const orderRef = doc(db, 'orders', orderNumber)
     await setDoc(orderRef, orderData)
+    
 
     // 注文アイテムをサブコレクションに追加
     const orderItemsCol = collection(orderRef, 'orderItems')
-    const orderItemsPromises = updatedOrderItems.map((item, index) => {
+    const orderItemsPromises = order.orderItems.map((item: OrderItem, index: number) => {
       const itemId = `${index + 1}`
       const orderItemRef = doc(orderItemsCol, itemId)
-      return setDoc(orderItemRef, item)
+      return setDoc(orderItemRef, {
+        ...item,
+        subtotal: item.price * item.quantity // 小計を計算して追加
+      })
     })
 
     await Promise.all(orderItemsPromises)
 
     alert('注文が登録されました。')
-    setOrderItems([{ productId: '', name: '', quantity: 1, price: 0, productData: null, subtotal: 0 }])
   } catch (error) {
     console.error('Error adding order: ', error)
     alert('注文の登録に失敗しました。')

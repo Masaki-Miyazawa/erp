@@ -29,12 +29,13 @@ const OrderForm = () => {
   ])
 
   // 注文情報を状態として保持
-  const [order, setOrder] = useState<Order>({
+  // 注文情報を状態として保持
+  const [order, setOrder] = useState<Omit<Order, 'id' | 'orderDate'>>({
     customerId: '',
     orderItems: [],
-    orderDate: Timestamp.now(),
     totalAmount: 0,
   })
+
 
   const addOrderItem = () => {
     setOrderItems(currentOrderItems => [
@@ -135,10 +136,46 @@ const OrderForm = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-    // submitOrder 関数を呼び出し、order オブジェクトを渡す
-    await submitOrder(customer, order, setIsLoading, alert)
+  
+    // 注文日時を設定
+    const orderToSubmit = {
+      ...order,
+      id: "", // このIDは後で生成するか、またはサーバー側で生成されるべきです。
+      orderItems: orderItems,
+      orderDate: Timestamp.now(),
+    }
+  
+    setIsLoading(true)
+    try {
+      // submitOrder 関数を呼び出し、order オブジェクトを渡す
+      await submitOrder(customer, orderToSubmit, setIsLoading, alert)
+      // 注文が成功したらアラートを表示し、状態を初期化する
+      alert('注文が正常に登録されました。')
+      // 状態を初期化する
+      setCustomer({
+        id: '',
+        name: '',
+        email: '',
+        phone:'',
+        address:'',
+        createdAt: null,
+        updatedAt: null,
+      })
+      setOrderItems([{ productId: '', name: '', quantity: 1, price: 0, productData: null, subtotal:0 }])
+      setOrder({
+        customerId: '',
+        orderItems: [],
+        totalAmount: 0,
+      })
+    } catch (error) {
+      // エラーが発生した場合はユーザーに通知する
+      console.error('注文の登録に失敗しました:', error)
+      alert('注文の登録に失敗しました。')
+    } finally {
+      setIsLoading(false)
+    }
   }
-
+  
   const handleCustomerSearchChange = (value: string) => {
     setCustomerSearchTerm(value)
   }

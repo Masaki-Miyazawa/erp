@@ -14,11 +14,14 @@ const OrdersPage = () => {
         // Firestore から注文データを取得
         const ordersQuery = query(collection(db, 'orders'), orderBy('orderDate', 'desc'))
         const querySnapshot = await getDocs(ordersQuery)
-        const fetchedOrders = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Order[]
-
+        const fetchedOrders = querySnapshot.docs.map((doc) => {
+          // doc.data() が Order 型に適合することを確認し、id を含める
+          const data = doc.data() as Order
+          return {
+            ...data,
+          }
+        })
+  
         setOrders(fetchedOrders)
       } catch (error) {
         console.error('Error fetching orders:', error)
@@ -27,10 +30,11 @@ const OrdersPage = () => {
         setLoading(false)
       }
     }
-
+  
     fetchOrders()
   }, [])
-
+  
+  
   if (loading) {
     return <div>Loading...</div>
   }
@@ -43,7 +47,7 @@ const OrdersPage = () => {
           <table className="min-w-full">
             <thead>
               <tr>
-                <th>注文番号</th>
+                <th>注文ID</th> {/* 注文IDのヘッダーを追加 */}
                 <th>顧客ID</th>
                 <th>注文日</th>
                 <th>合計金額</th>
@@ -53,7 +57,7 @@ const OrdersPage = () => {
             <tbody>
               {orders.map((order) => (
                 <tr key={order.id}>
-                  <td>{order.id}</td>
+                  <td>{order.id}</td> {/* 注文のドキュメント ID を表示 */}
                   <td>{order.customerId}</td>
                   <td>{order.orderDate.toDate().toLocaleDateString()}</td>
                   <td>{order.totalAmount}</td>
