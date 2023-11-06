@@ -1,12 +1,13 @@
 import {
   collection,
   getDocs,
-  addDoc,
+  setDoc,
   Timestamp,
   doc,
   getDoc,
   updateDoc,
-  DocumentSnapshot
+  DocumentSnapshot,
+  runTransaction
 } from "firebase/firestore"
 import { Customer } from "../types"
 import { db } from "../firebase"
@@ -47,11 +48,34 @@ export async function updateCustomer(id: string, updateData: Partial<Customer>):
   await updateDoc(customerRef, updateData)
 }
 
+// カウンターをトランザクションを使用して更新する関数
+async function getNewCustomerId(): Promise<string> {
+  const counterRef = doc(db, "counters", "customers")
+
+  try {
+    const newCount = await runTransaction(db, async (transaction) => {
+      const counterDoc = await transaction.get(counterRef)
+      const currentCount = counterDoc.data()?.count || 0
+      const newCount = currentCount + 1
+      transaction.set(counterRef, { count: newCount })
+      return newCount
+    })
+
+    return newCount.toString() // 新しいIDを文字列として返す
+  } catch (error) {
+    console.error("Transaction failed: ", error)
+    throw new Error('Transaction failed')
+  }
+}
+
 // 新しい顧客をFirestoreに追加する関数
 export async function addNewCustomer(customerData: Customer): Promise<void> {
   try {
-    await addDoc(collection(db, "customers"), {
+    const newId = await getNewCustomerId() // 新しいIDを取得
+    const customerRef = doc(db, "customers", newId)
+    await setDoc(customerRef, {
       ...customerData,
+      id: newId,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
     })

@@ -34,7 +34,7 @@ export default function CRM() {
 
     // Customer インターフェースに基づいて顧客データを作成
     const customerData: Customer = {
-      id: "123",
+      id: undefined,
       name,
       email,
       phone,
@@ -45,7 +45,7 @@ export default function CRM() {
     
 
     try {
-      await addNewCustomer(customerData)
+      await addNewCustomer( customerData )
       // 登録後の処理
       setName("")
       setEmail("")

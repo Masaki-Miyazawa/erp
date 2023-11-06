@@ -19,8 +19,8 @@ export interface Customer {
   communicationNotes?: CommunicationNote[] // 顧客とのコミュニケーションメモドキュメントID（オプショナル）
   communicationLogs?: CommunicationLog //顧客とのコミュニケーションログID（オプショナル）
   loyaltyPoints?: number // 顧客のロイヤリティポイント（オプショナル）
-  createdAt: Timestamp // レコードの作成日時
-  updatedAt: Timestamp // レコードの最終更新日時
+  createdAt: Timestamp | null // レコードの作成日時
+  updatedAt: Timestamp | null // レコードの最終更新日時
 }
 
 /**
@@ -108,13 +108,36 @@ export interface ProductReview {
  */
 export interface Product {
   name: string // 商品名
-  description: string // 商品説明
+  description?: string // 商品説明
   price: number // 商品価格
-  categories: string[] // 商品カテゴリのリスト
-  images: string[] // 商品画像のURLのリスト
-  stock: number // 在庫数
-  tags: string[] // 商品を説明するタグのリスト
-  reviews: ProductReview[] // 商品のレビューリスト
-  createdAt: Timestamp // 商品レコードの作成日時
-  updatedAt: Timestamp // 商品レコードの最終更新日時
+  categories?: string[] // 商品カテゴリのリスト
+  images?: string[] // 商品画像のURLのリストx
+  stock?: number // 在庫数
+  tags?: string[] // 商品を説明するタグのリスト
+  reviews?: ProductReview[] // 商品のレビューリスト
+  createdAt?: Timestamp | null // 商品レコードの作成日時
+  updatedAt?: Timestamp | null// 商品レコードの最終更新日時
+}
+
+/**
+ * 注文データを表すインターフェース
+ */
+export interface Order {
+  customerId: string // 顧客のID
+  orderDate: Timestamp // 注文日時
+  totalAmount: number // 注文の合計金額
+  orderItems: OrderItem[] // 注文に含まれる商品アイテムのリスト
+}
+
+/**
+ * 注文アイテムを表すインターフェース
+ */
+export type OrderItem = {
+  productId: string // 商品ID
+  name: string // 商品名
+  quantity: number // 数量
+  price: number // 単価
+  productData?: Product | null // 商品データ、存在しない場合はnullが入る
+  fetchAttempted?: boolean // 商品データのフェッチ試行が行われたかどうか
+  subtotal: number //小計
 }
