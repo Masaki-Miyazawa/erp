@@ -1,0 +1,14 @@
+[
+  {
+    "productId": "1",
+    "name": "Laptop",
+    "description": "A high-end laptop",
+    "price": 1500
+  },
+  {
+    "productId": "2",
+    "name": "Smartphone",
+    "description": "A new smartphone with great features",
+    "price": 700
+  }
+]

@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
-import { getCustomer, updateCustomer } from '../../../src/utils/functions/customerfunctions'
+import { getCustomer, updateCustomer } from '../../../src/utils/functions/customerFunctions'
 import { Customer } from '../../../src/utils/types'
 
 export default function EditCustomerPage() {

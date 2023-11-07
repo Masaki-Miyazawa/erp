@@ -37,7 +37,7 @@ export const submitOrder = async (
 
     // Order型に基づいて注文データを作成（orderItemsは含まない）
     const orderData: Omit<Order, 'orderItems'> = {
-      id: orderNumber,
+      orderId: orderNumber,
       customerId: typeof customer.id === 'string' ? customer.id : customer.id.toString(),
       orderDate: Timestamp.now(),
       totalAmount: order.totalAmount, // 事前に計算された合計金額を使用

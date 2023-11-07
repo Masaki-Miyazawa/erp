@@ -123,7 +123,7 @@ export interface Product {
  * 注文データを表すインターフェース
  */
 export interface Order {
-  id: string //OrderのドキュメントID
+  orderId: string //OrderのドキュメントID
   customerId: string // 顧客のID
   orderDate: Timestamp // 注文日時
   totalAmount: number // 注文の合計金額
@@ -134,6 +134,7 @@ export interface Order {
  * 注文アイテムを表すインターフェース
  */
 export type OrderItem = {
+  orderIndex: number //注文商品順ID
   productId: string // 商品ID
   name: string // 商品名
   quantity: number // 数量

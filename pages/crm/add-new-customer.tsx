@@ -1,6 +1,6 @@
 // pages/resistorationCustomer.tsx
 import { useState } from "react"
-import { addNewCustomer } from "../../src/utils/functions/customerfunctions"
+import { addNewCustomer } from "../../src/utils/functions/customerFunctions"
 import { Customer } from "../../src/utils/types"
 import { Timestamp } from "firebase/firestore"
 import { GetServerSideProps } from "next"

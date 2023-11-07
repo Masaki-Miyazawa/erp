@@ -1,8 +1,9 @@
 import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
-import { getCustomers } from '../../src/utils/functions/customerfunctions'
+import { getCustomers } from '../../src/utils/functions/customerFunctions'
 import { Customer } from '../../src/utils/types'
 import { Key } from 'react'
+import Button from '../../src/components/button'
 
 // Propsの型定義
 interface CustomersPageProps {
@@ -83,13 +84,9 @@ const CustomersPage: React.FC<CustomersPageProps> = ({ customerList, error }) =>
       </div>
       <div className="mt-6">
         <span className="block w-full rounded-md shadow-sm">
-          <button
-            type="button" // ここを 'button' に変更してください
+          <Button label="戻る"
             onClick={handleBack} // onClickイベントにhandleBackを割り当てる
-            className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gray-500 hover:bg-gray-400 focus:outline-none focus:border-gray-600 focus:shadow-outline-gray active:bg-gray-600 transition duration-150 ease-in-out"
-          >
-          戻る
-          </button>
+          />
         </span>
       </div>
     </div>

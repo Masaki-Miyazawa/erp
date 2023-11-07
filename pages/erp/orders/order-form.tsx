@@ -7,6 +7,7 @@ import Modal from '../../../src/components/modal'
 import { Customer, Product} from '../../../src/utils/types'
 import { submitOrder } from '../../../src/utils/functions/orderFunctions'
 import { Order, OrderItem } from '../../../src/utils/types'
+import { useRouter } from 'next/router'
 
 
 const OrderForm = () => {
@@ -25,12 +26,18 @@ const OrderForm = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false) // ローディング状態を管理するステート
   const [orderItems, setOrderItems] = useState<OrderItem[]>([
-    { productId: '', name: '', quantity: 1, price: 0, productData: null, subtotal:0},
+    { orderIndex: 1, productId: '', name: '', quantity: 1, price: 0, productData: null, subtotal:0},
   ])
 
-  // 注文情報を状態として保持
+  const router = useRouter()
+  // 前のページに戻る関数
+  const handleBack = () => {
+    router.back()
+  }
+
   // 注文情報を状態として保持
   const [order, setOrder] = useState<Omit<Order, 'id' | 'orderDate'>>({
+    orderId:'',
     customerId: '',
     orderItems: [],
     totalAmount: 0,
@@ -40,7 +47,7 @@ const OrderForm = () => {
   const addOrderItem = () => {
     setOrderItems(currentOrderItems => [
       ...currentOrderItems,
-      { productId: '', name: '', quantity: 1, price: 0, productData: null, subtotal: 0 },
+      { orderIndex: 1,productId: '', name: '', quantity: 1, price: 0, productData: null, subtotal: 0 },
     ])
   }
 
@@ -140,7 +147,7 @@ const OrderForm = () => {
     // 注文日時を設定
     const orderToSubmit = {
       ...order,
-      id: "", // このIDは後で生成するか、またはサーバー側で生成されるべきです。
+      orderId: "", // このIDは後で生成するか、またはサーバー側で生成されるべきです。
       orderItems: orderItems,
       orderDate: Timestamp.now(),
     }
@@ -149,8 +156,7 @@ const OrderForm = () => {
     try {
       // submitOrder 関数を呼び出し、order オブジェクトを渡す
       await submitOrder(customer, orderToSubmit, setIsLoading, alert)
-      // 注文が成功したらアラートを表示し、状態を初期化する
-      alert('注文が正常に登録されました。')
+      
       // 状態を初期化する
       setCustomer({
         id: '',
@@ -161,8 +167,9 @@ const OrderForm = () => {
         createdAt: null,
         updatedAt: null,
       })
-      setOrderItems([{ productId: '', name: '', quantity: 1, price: 0, productData: null, subtotal:0 }])
+      setOrderItems([{ orderIndex: 1, productId: '', name: '', quantity: 1, price: 0, productData: null, subtotal:0 }])
       setOrder({
+        orderId:'',
         customerId: '',
         orderItems: [],
         totalAmount: 0,
@@ -334,6 +341,7 @@ const OrderForm = () => {
       </form>
       {/* ローディングインジケーターを表示 */}
       {isLoading && <div>Loading...</div>}
+      <Button label= "戻る" onClick={handleBack}/>
     </div>
   )
 }

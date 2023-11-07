@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "firebase emulators:start & NODE_ENV=development next dev",
+    "dev": "npm run emulators & npm run start-next",
+    "emulators": "firebase emulators:start --only functions,firestore,auth",
+    "import-data": "ts-node -O '{\"module\":\"commonjs\"}' scripts/import-test-data.ts",
+    "start-next": "wait-on tcp:4000 & wait-on tcp:9099 & npm run import-data && NODE_ENV=development next dev",
     "build": "NODE_ENV=production next build",
     "start": "NODE_ENV=production next start",
     "lint": "next lint"
@@ -31,6 +34,8 @@
     "postcss": "^8.4.31",
     "prettier": "^3.0.3",
     "tailwindcss": "^3.3.5",
-    "typescript": "^5"
+    "ts-node": "^10.9.1",
+    "typescript": "^5",
+    "wait-on": "^7.1.0"
   }
 }
