@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app'
+import { initializeApp, FirebaseError } from 'firebase/app'
 import {
   getFirestore,
   doc,
@@ -9,13 +9,13 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   connectAuthEmulator,
+  AuthError,
 } from 'firebase/auth'
 
 // テストデータをインポートする
 import customers from './test-data-customers.json'
 import products from './test-data-products.json'
 import users from './test-data-users.json'
-import firebase from 'firebase/compat/app'
 
 const firebaseConfig = {
   apiKey: "AIzaSyDsno6Y7F3Rn5jQ0zPdgl17CwD4rZJoK18",
@@ -50,23 +50,20 @@ async function importTestData(): Promise<void> {
     await setDoc(productRef, product)
   }
 
-  // // Authenticationユーザーのインポート
-  // for (const user of users) {
-  //   try {
-  //     await createUserWithEmailAndPassword(auth, user.email, user.password)
-  //   } catch (error: unknown) { // TypeScript 4.0以降の構文
-  //     if (error instanceof Error && error.name === 'FirebaseError') {
-  //       const firebaseError = error as firebase.FirebaseError // エラーをFirebaseError型にキャスト
-  //       if (firebaseError.code === 'auth/email-already-in-use') {
-  //         console.log(`User already exists: ${user.email}`)
-  //       } else {
-  //         console.error('Error creating user:', firebaseError)
-  //       }
-  //     } else {
-  //       console.error('Unknown error:', error)
-  //     }
-  //   }
-  // }
+  // Authenticationユーザーのインポート
+  // Create users
+  for (const user of users) {
+    try {
+      await createUserWithEmailAndPassword(auth, user.email, user.password)
+    } catch (error) {
+      const e = error as AuthError
+      if (e.code === 'auth/email-already-in-use') {
+        console.log(`User already exists: ${user.email}`)
+      } else {
+        console.error('Error creating user:', e)
+      }
+    }
+  }
 
   console.log('All test data imported successfully.')
 }

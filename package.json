@@ -6,7 +6,7 @@
     "dev": "npm run emulators & npm run start-next",
     "emulators": "firebase emulators:start --only functions,firestore,auth",
     "import-data": "ts-node -O '{\"module\":\"commonjs\"}' scripts/import-test-data.ts",
-    "start-next": "wait-on tcp:4000 & wait-on tcp:9099 & npm run import-data && NODE_ENV=development next dev",
+    "start-next": "wait-on tcp:4000 && NODE_ENV=development next dev & wait-on http://localhost:3000 && npm run import-data",
     "build": "NODE_ENV=production next build",
     "start": "NODE_ENV=production next start",
     "lint": "next lint"
